@@ -18,7 +18,19 @@ class BurgerBuilder extends Component {
             meat: 0,
             lettuce: 0
         },
-        totalPrice: 4
+        totalPrice: 4,
+        purchasable: false
+    }
+
+    updatePurchaseState (ingredients) {
+        const sum = Object.keys(ingredients)    // array met lettuce, meat, etc
+            .map(igKey => {
+            return ingredients[igKey]       // nieuwe array met 0, 1, 0 of wat de aantallen ook zijn
+        }).reduce((sum, el) => {
+            return sum + el;
+        }, 0);                              // alle aantallen bij elkaar opgeteld
+
+        this.setState({purchasable: sum > 0})   // setState true of false, afhankelijk van of er ingrediënten op die hamburger zitten. 1 is al genoeg.
     }
 
     changeIngredientHandler = (type, adrem) => {
@@ -43,6 +55,7 @@ class BurgerBuilder extends Component {
         updatedIngredients[type] = updatedCount;                // je zet het nieuwe [type]aantal in de kopie
 
         this.setState({totalPrice: newPrice, ingredients: updatedIngredients})      // je setState de nieuwe versies van totalPrice en ingredients
+        this.updatePurchaseState(updatedIngredients);       // we geven meteen de geüpdatete ingrediënten door aan purchasable, anders werkt die nog met de vorige state
     }
 
     addIngredientHandler = (type) => {
@@ -94,7 +107,9 @@ class BurgerBuilder extends Component {
                 <BuildControls 
                     ingredientAdded={this.addIngredientHandler} 
                     ingredientRemoved={this.removeIngredientHandler}
-                    disabled={disabledInfo} /* disabledInfo is hier een object { lettuce: true, meat: false } etc oid */ />
+                    disabled={disabledInfo} /* disabledInfo is hier een object { lettuce: true, meat: false } etc oid */ 
+                    price={this.state.totalPrice}
+                    purchasable={this.state.purchasable} />
             </Aux>
         );
     }
