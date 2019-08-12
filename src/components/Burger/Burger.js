@@ -10,7 +10,6 @@ const burger = (props) => {
     }).reduce((arr, el) => {        // AAAAAAAAAARGH
         return arr.concat(el)       // dat gezegd hebbende, arr is het vorige element, dat begint met het optionele initial argument dat je ná de callback functie invoegt: die lege array []. Dus daar beginnen we mee, we pakken het eerste element el, en concatten het aan die lege array. Volgende huidige element plakken we daar weer aan vast, etc.
     }, [])
-    console.log(transformedIngredients);  // dus dit is nu een lange lijst met ingrediënten, met dubbelen als er dubbele porties op zitten
 
     if (transformedIngredients.length === 0) {
         transformedIngredients = <p>None pizza with left beef is NOT an option!</p>

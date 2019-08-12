@@ -20,7 +20,7 @@ const buildControls = (props) => (                      // toFixed(2) om het get
                 label={ctrl.label}
                 disabled={props.disabled[ctrl.type]} /* we krijgen hier de prop disabled, kijken specifiek naar het relevante type, en geven daarmee indirect true/false door */ />
         ))}
-        <button className={classes.OrderButton} /* onClick={} */ disabled={!props.purchasable} >Order!</button>
+        <button className={classes.OrderButton}  onClick={props.ordered} disabled={!props.purchasable} >Order!</button>
     </div>
 ); 
 

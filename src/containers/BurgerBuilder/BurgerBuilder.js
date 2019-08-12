@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Aux from '../../hoc/Aux';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 
 const INGREDIENT_PRICES = {     // global constants doe je met alleen hoofdletters
     lettuce: 0.5,
@@ -19,10 +21,11 @@ class BurgerBuilder extends Component {
             lettuce: 0
         },
         totalPrice: 4,
-        purchasable: false
+        purchasable: false,
+        purchasing: false
     }
 
-    updatePurchaseState (ingredients) {
+    updatePurchaseState (ingredients) {     // hoeft geen arrowfunctie te zijn, want alle calls bevinden zich ook hier in dezelfde scope
         const sum = Object.keys(ingredients)    // array met lettuce, meat, etc
             .map(igKey => {
             return ingredients[igKey]       // nieuwe array met 0, 1, 0 of wat de aantallen ook zijn
@@ -30,7 +33,7 @@ class BurgerBuilder extends Component {
             return sum + el;
         }, 0);                              // alle aantallen bij elkaar opgeteld
 
-        this.setState({purchasable: sum > 0})   // setState true of false, afhankelijk van of er ingrediënten op die hamburger zitten. 1 is al genoeg.
+        this.setState({purchasable: sum > 0})   // setState true of false, afhankelijk van of er ingrediënten op die hamburger zitten. 1 is al genoeg. De echte vraag is waarom dit werkt terwijl dit geen arrowfunctie is
     }
 
     changeIngredientHandler = (type, adrem) => {
@@ -60,37 +63,22 @@ class BurgerBuilder extends Component {
 
     addIngredientHandler = (type) => {
         this.changeIngredientHandler(type, 'add');
-
-        // const oldCount = this.state.ingredients[type];      // je neemt het oude aantal van ingredient [type]
-        
-        // const priceIngredient = INGREDIENT_PRICES[type];      // je plukt de prijs per unit [type] uit de globale prijsdatabase
-        // const oldPrice = this.state.totalPrice;             // je neemt de oude totaalprijs uit state en gooit hem in oldPrice
-
-        // const updatedCount = oldCount +1;                     // het oude aantal [type] wordt aangepast met 1 tegelijk
-        // const newPrice = oldPrice + priceIngredient;          // je telt de [type] prijs bij het oude totaal op
-
-        // const updatedIngredients = { ...this.state.ingredients };   // je kopieert state.ingredients en slaat de kopie op in updatedIngredients
-        // updatedIngredients[type] = updatedCount;                // je zet het nieuwe [type]aantal in de kopie
-
-        // this.setState({totalPrice: newPrice, ingredients: updatedIngredients})      // je setState de nieuwe versies van totalPrice en ingredients
-
     }
 
     removeIngredientHandler = (type) => {
         this.changeIngredientHandler(type, 'remove');
+    }
 
-        // const oldCount = this.state.ingredients[type];      // je neemt het oude aantal van ingredient [type]
-        // if (oldCount <= 0) {
-        //     return;
-        // };
-        // const updatedCount = oldCount -1;                     
-        // const updatedIngredients = { ...this.state.ingredients };   // je kopieert state.ingredients en slaat de kopie op in updatedIngredients
-        // updatedIngredients[type] = updatedCount;                // je zet het nieuwe [type]aantal in de kopie
+    purchaseHandler = () => {           // moet een arrowfunctie zijn, want wordt elders gecalld, dus moet this verwijzen naar deze component en niet naar waar this naar verwijst op de plek waar deze functie gecalld wordt.
+        this.setState({ purchasing: true });
+    }
 
-        // const priceIngredient = INGREDIENT_PRICES[type];      // je plukt de prijs per unit [type] uit de globale prijsdatabase
-        // const oldPrice = this.state.totalPrice;             // je neemt de oude totaalprijs uit state en gooit hem in oldPrice
-        // const newPrice = oldPrice - priceIngredient;
-        // this.setState({totalPrice: newPrice, ingredients: updatedIngredients})      // je setState de nieuwe versies van totalPrice en ingredients
+    purchaseCancelHandler = () => {
+        this.setState({ purchasing: false });
+    }
+
+    purchaseContinueHandler = () => {
+        console.log(`you still want this burger!!1! :'-)`);
     }
 
     render () {
@@ -103,13 +91,21 @@ class BurgerBuilder extends Component {
 
         return (
             <Aux>
+                <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler} >
+                    <OrderSummary 
+                        ingredients={this.state.ingredients}
+                        purchaseCancelled={this.purchaseCancelHandler}
+                        purchaseContinued={this.purchaseContinueHandler}
+                        price={this.state.totalPrice} />
+                </Modal>
                 <Burger ingredients={this.state.ingredients} />
                 <BuildControls 
                     ingredientAdded={this.addIngredientHandler} 
                     ingredientRemoved={this.removeIngredientHandler}
                     disabled={disabledInfo} /* disabledInfo is hier een object { lettuce: true, meat: false } etc oid */ 
                     price={this.state.totalPrice}
-                    purchasable={this.state.purchasable} />
+                    purchasable={this.state.purchasable}
+                    ordered={this.purchaseHandler} />
             </Aux>
         );
     }
