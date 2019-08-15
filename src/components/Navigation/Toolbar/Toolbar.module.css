@@ -1,6 +1,6 @@
 .Toolbar {
     height: 56px;
-    width: 100%;
+    width: 97%;
     position: fixed;
     top: 0;
     left: 0;
@@ -14,4 +14,14 @@
 
 .Toolbar nav {
     height: 100%;
+}
+
+.logo {
+    height: 75%;
+}
+
+@media (max-width: 499px) {
+    .DesktopOnly {
+        display: none;
+    }
 }
