@@ -1,6 +1,6 @@
 .Toolbar {
     height: 56px;
-    width: 97%;
+    width: 100%;
     position: fixed;
     top: 0;
     left: 0;
@@ -14,10 +14,13 @@
 
 .Toolbar nav {
     height: 100%;
+    margin-right: 60px;
 }
 
 .logo {
     height: 75%;
+    margin-right: 45px;
+    margin-bottom: 7px;
 }
 
 @media (max-width: 499px) {
