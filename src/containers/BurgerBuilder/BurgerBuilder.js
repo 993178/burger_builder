@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+
 import Aux from '../../hoc/Aux';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import axios from '../../axios-orders';     // is dus de instance, niet direct axios zelf
+import Spinner from '../../components/UI/Spinner/Spinner';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 const INGREDIENT_PRICES = {     // global constants doe je met alleen hoofdletters
     lettuce: 0.5,
@@ -20,11 +24,23 @@ class BurgerBuilder extends Component {
             meat: 0,
             lettuce: 0
         },
+        // ingredients: null,       // met backend database beginnen we met null. Dat betekent wel dat verschillende componenten niet meteen geladen kunnen worden, want die gaan ervan uit dat er iets zinnigs in this.state.ingredients staat
         totalPrice: 4,
         purchasable: false,
-        purchasing: false
+        purchasing: false,
+        error: false,    // voor als ingredients uit database ophalen niet lukt en we een zinvolle .catch nodig hebben omdat anders eeuwig geladen wordt
+        loading: false
     }
-
+/*
+    componentDidMount () {       // Discount Jonas zet de ingredients direct in de FireBase database en importeert ze dan hier, als response.data (=object)
+        axios.get('/ingredients.json')
+          .then(response => {
+              this.setState({ingredients: response.data})
+          }).catch(error => {
+              this.setState({error: true})
+          })
+    }
+*/
     updatePurchaseState (ingredients) {     // hoeft geen arrowfunctie te zijn, want alle calls bevinden zich ook hier in dezelfde scope
         const sum = Object.keys(ingredients)    // array met lettuce, meat, etc
             .map(igKey => {
@@ -78,7 +94,31 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        console.log(`you still want this burger!!1! :'-)`);
+        this.setState({loading: true});         // zodat we eerst de spinner te zien krijgen zodra er op Continue geklikt wordt
+        const order = {
+            ingredients: this.state.ingredients,
+            price: this.state.totalPrice,        // in een echte app doe je dit aan de serverkant, zodat de gebruiker er niet bij kan om zichzelf korting te geven
+            customer: {
+                name: 'Discount Jonas',         // dummy data, gehardcoded, tja, ach, gelukkig zit er geloof ik al een betere versie in de DIY-shop
+                address: {
+                    street: 'Teststreet 1',
+                    zipCode: '54212',
+                    country: 'Germany'
+                },
+                email: 'DiscountJonas@test.com'
+            },
+            deliveryMethod: 'fastest'   // Discount Jonas gaat ervan uit dat er ook een goedkope optie is... 
+        }
+
+        axios.post('/posts', order)   // in firebase moet dit '/orders.json' zijn
+            .then(res => {
+                this.setState({loading: false, purchasing: false});
+                console.log(res);
+            })
+            .catch(error => {
+                this.setState({loading: false, purchasing: false});
+                console.log(error);
+            })
     }
 
     render () {
@@ -89,15 +129,12 @@ class BurgerBuilder extends Component {
             disabledInfo[key] = disabledInfo[key] <= 0  // bij elk ingredient checken we of de hoeveelheid kleiner of gelijk is aan 0, zo ja, dan slaan we true op onder die key in disabledInfo: { lettuce: true, meat: false } etc
         }
 
-        return (
-            <Aux>
-                <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler} >
-                    <OrderSummary 
-                        ingredients={this.state.ingredients}
-                        purchaseCancelled={this.purchaseCancelHandler}
-                        purchaseContinued={this.purchaseContinueHandler}
-                        price={this.state.totalPrice} />
-                </Modal>
+        let orderSummary = null         // als er in eerste instantie geen ingredienten zijn, kan OrderSummary ook niet laden
+
+        let burger = (this.state.error) ? <p>Ingredients can't be loaded!</p> : <Spinner />          // nodig bij database en initial state.ingredients: null. Als de ingredienten helemaal niet doorkomen uit de database, moet dat gemeld worden ipv een spinner
+            
+        if (this.state.ingredients) {   // (heb ik dus altijd, want ik heb state.ingredients niet op null...)
+            burger = (<Aux>
                 <Burger ingredients={this.state.ingredients} />
                 <BuildControls 
                     ingredientAdded={this.addIngredientHandler} 
@@ -106,9 +143,28 @@ class BurgerBuilder extends Component {
                     price={this.state.totalPrice}
                     purchasable={this.state.purchasable}
                     ordered={this.purchaseHandler} />
+            </Aux>);
+            orderSummary = <OrderSummary 
+            ingredients={this.state.ingredients}
+            purchaseCancelled={this.purchaseCancelHandler}
+            purchaseContinued={this.purchaseContinueHandler}
+            price={this.state.totalPrice} />;
+        }
+
+        if (this.state.loading) {       // deze if moet onder de vorige, wat deze moet die andere overriden
+            orderSummary = <Spinner />;
+        }
+
+
+        return (
+            <Aux>
+                <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler} >
+                    {orderSummary}
+                </Modal>
+                {burger}
             </Aux>
         );
     }
 }
 
-export default BurgerBuilder;
+export default withErrorHandler(BurgerBuilder, axios);

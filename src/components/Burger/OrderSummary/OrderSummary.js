@@ -4,9 +4,9 @@ import Button from '../../UI/Button/Button';
 
 class OrderSummary extends Component {
     // dit is nu alleen maar een class om componentWillUpdate te kunnen laten zien, het was gewoon een functional component
-    componentWillUpdate() {
-        console.log('orderSummary update');     // puur om te laten zien dat OrderSummary zonder shouldComponentUpdate in Modal wordt geüpdatet iedere keer als de gebruiker iets aan zijn hamburger verandert. Maar deze component is alleen belangrijk voor de Modal, en die is tijdens het burgerbuilden onzichtbaar, dus waarom dan steeds rerenderen? Precies.
-    }
+    // componentWillUpdate() {
+    //     console.log('orderSummary update');     // puur om te laten zien dat OrderSummary zonder shouldComponentUpdate in Modal wordt geüpdatet iedere keer als de gebruiker iets aan zijn hamburger verandert. Maar deze component is alleen belangrijk voor de Modal, en die is tijdens het burgerbuilden onzichtbaar, dus waarom dan steeds rerenderen? Precies.
+    // }
     // we doen de shouldComponentUpdate niet hier omdat dit altijd geüpdatet moet zijn als Modal zichtbaar is, dus dáár doen we de check
 
     render() {
