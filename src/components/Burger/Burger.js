@@ -1,4 +1,6 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';  // Burger wordt, in tegenstelling tot BurgerBuilder waar ie zijn props vandaan krijgt, niet direct via een Route geladen, dus de props bevatten normaalgesproken geen history en match. Met withRouter kun je dat fixen
+
 import classes from './Burger.module.css';
 import BurgerIngredient from './BurgerIngredient/BurgerIngredient';
 
@@ -24,4 +26,4 @@ const burger = (props) => {
     );
 };
 
-export default burger;
+export default withRouter(burger);

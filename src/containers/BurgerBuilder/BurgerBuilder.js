@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';  // MOET NIET NODIG ZIJN
 
 import Aux from '../../hoc/Aux';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
-import axios from '../../axios-orders';     // is dus de instance, niet direct axios zelf
+// import axios from '../../axios-orders';     // is dus de instance, niet direct axios zelf
 import Spinner from '../../components/UI/Spinner/Spinner';
-import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+// import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+
 
 const INGREDIENT_PRICES = {     // global constants doe je met alleen hoofdletters
     lettuce: 0.5,
@@ -31,16 +33,17 @@ class BurgerBuilder extends Component {
         error: false,    // voor als ingredients uit database ophalen niet lukt en we een zinvolle .catch nodig hebben omdat anders eeuwig geladen wordt
         loading: false
     }
-/*
+
     componentDidMount () {       // Discount Jonas zet de ingredients direct in de FireBase database en importeert ze dan hier, als response.data (=object)
-        axios.get('/ingredients.json')
-          .then(response => {
-              this.setState({ingredients: response.data})
-          }).catch(error => {
-              this.setState({error: true})
-          })
+        console.log(this.props);
+        // axios.get('/ingredients.json')
+        //   .then(response => {
+        //       this.setState({ingredients: response.data})
+        //   }).catch(error => {
+        //       this.setState({error: true})
+        //   })
     }
-*/
+
     updatePurchaseState (ingredients) {     // hoeft geen arrowfunctie te zijn, want alle calls bevinden zich ook hier in dezelfde scope
         const sum = Object.keys(ingredients)    // array met lettuce, meat, etc
             .map(igKey => {
@@ -94,31 +97,32 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        this.setState({loading: true});         // zodat we eerst de spinner te zien krijgen zodra er op Continue geklikt wordt
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,        // in een echte app doe je dit aan de serverkant, zodat de gebruiker er niet bij kan om zichzelf korting te geven
-            customer: {
-                name: 'Discount Jonas',         // dummy data, gehardcoded, tja, ach, gelukkig zit er geloof ik al een betere versie in de DIY-shop
-                address: {
-                    street: 'Teststreet 1',
-                    zipCode: '54212',
-                    country: 'Germany'
-                },
-                email: 'DiscountJonas@test.com'
-            },
-            deliveryMethod: 'fastest'   // Discount Jonas gaat ervan uit dat er ook een goedkope optie is... 
-        }
+        // this.setState({loading: true});         // zodat we eerst de spinner te zien krijgen zodra er op Continue geklikt wordt
+        // const order = {
+        //     ingredients: this.state.ingredients,
+        //     price: this.state.totalPrice,        // in een echte app doe je dit aan de serverkant, zodat de gebruiker er niet bij kan om zichzelf korting te geven
+        //     customer: {
+        //         name: 'Discount Jonas',         // dummy data, gehardcoded, tja, ach, gelukkig zit er geloof ik al een betere versie in de DIY-shop
+        //         address: {
+        //             street: 'Teststreet 1',
+        //             zipCode: '54212',
+        //             country: 'Germany'
+        //         },
+        //         email: 'DiscountJonas@test.com'
+        //     },
+        //     deliveryMethod: 'fastest'   // Discount Jonas gaat ervan uit dat er ook een goedkope optie is... 
+        // }
 
-        axios.post('/posts', order)   // in firebase moet dit '/orders.json' zijn
-            .then(res => {
-                this.setState({loading: false, purchasing: false});
-                console.log(res);
-            })
-            .catch(error => {
-                this.setState({loading: false, purchasing: false});
-                console.log(error);
-            })
+        // axios.post('/posts', order)   // in firebase moet dit '/orders.json' zijn
+        //     .then(res => {
+        //         this.setState({loading: false, purchasing: false});
+        //         console.log(res);
+        //     })
+        //     .catch(error => {
+        //         this.setState({loading: false, purchasing: false});
+        //         console.log(error);
+        //     })
+        this.props.history.push('/checkout');   // ipv allerlei dingen direct te doen, gaan we alleen maar naar onze nieuwe checkoutpagina
     }
 
     render () {
@@ -167,4 +171,5 @@ class BurgerBuilder extends Component {
     }
 }
 
-export default withErrorHandler(BurgerBuilder, axios);
+// export default withErrorHandler(BurgerBuilder, axios);
+export default withRouter(BurgerBuilder);   // dit is erg idioot, want history. match etc hoort gewoon al in de BurgerBuilder props te zitten. Maar om een of andere reden is props hier leeg??!! index.js, app.js zijn identiek aan Discount Jonas' versie, BurgerBuilder.js is identiek op het FireBasegedoe na. Iek niet begroip.

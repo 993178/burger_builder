@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Route, Switch } from 'react-router-dom';
+
 import Layout from './components/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
+import Checkout from './containers/Checkout/Checkout';
 
-function App() {
-  return (
-    <Layout>
-      <BurgerBuilder />
-    </Layout>
-  );
+
+class App extends Component {
+  render () {
+    return (
+      <div>
+        <Layout>
+          <Switch>
+            <Route path="/checkout" component={Checkout} /> {/* alles tussen BrowserRouter tags hoort bij het routable deel van de app, maar alleen de componenten die direct via een Route geladen worden krijgen bij hun props ook history, match etc mee. */}
+            <Route path="/" exact component={BurgerBuilder} /> {/**hier kan ook nog exact op zodat alleen dit specifieke path naar de burgerbuilder leidt */}
+          </Switch>
+        </Layout>
+      </div>
+    );
+  }
 }
 
 export default App;
