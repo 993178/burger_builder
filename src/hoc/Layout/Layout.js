@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Aux from '../../hoc/Aux';    // hoofdletter A want custom component
+import Aux from '../Aux/Aux';    // hoofdletter A want custom component
 import classes from './Layout.module.css';
-import Toolbar from '../Navigation/Toolbar/Toolbar';
-import SideDrawer from '../Navigation/SideDrawer/SideDrawer';
+import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
+import SideDrawer from '../../components/Navigation/SideDrawer/SideDrawer';
 
 // Discount Jonas gooit de hele Layoutmap in hoc en gooit Aux in zijn eigen Auxmap binnen hoc. Ga ik niet doen. 
 

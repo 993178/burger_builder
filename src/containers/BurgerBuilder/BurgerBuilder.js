@@ -1,58 +1,60 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';  // MOET NIET NODIG ZIJN
 
-import Aux from '../../hoc/Aux';
+import Aux from '../../hoc/Aux/Aux';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
-// import axios from '../../axios-orders';     // is dus de instance, niet direct axios zelf
 import Spinner from '../../components/UI/Spinner/Spinner';
-// import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+import axios from '../../axios-orders';   // is dus de instance, niet direct axios zelf
 
-
-const INGREDIENT_PRICES = {     // global constants doe je met alleen hoofdletters
-    lettuce: 0.5,
+const INGREDIENT_PRICES = {    // global constants doe je met alleen hoofdletters
+    salad: 0.5,
     cheese: 0.4,
     meat: 1.3,
     bacon: 0.7
-}
+};
 
 class BurgerBuilder extends Component {
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {...}
+    // }
     state = {
-        ingredients: {
+        ingredients: {      // met backend database is dit ingredients: null
             bacon: 0,
             cheese: 0,
             meat: 0,
             lettuce: 0
         },
-        // ingredients: null,       // met backend database beginnen we met null. Dat betekent wel dat verschillende componenten niet meteen geladen kunnen worden, want die gaan ervan uit dat er iets zinnigs in this.state.ingredients staat
         totalPrice: 4,
         purchasable: false,
         purchasing: false,
-        error: false,    // voor als ingredients uit database ophalen niet lukt en we een zinvolle .catch nodig hebben omdat anders eeuwig geladen wordt
-        loading: false
+        loading: false,
+        error: false        // voor als ingredients uit database ophalen niet lukt en we een zinvolle .catch nodig hebben omdat anders eeuwig geladen wordt
     }
 
-    componentDidMount () {       // Discount Jonas zet de ingredients direct in de FireBase database en importeert ze dan hier, als response.data (=object)
+    componentDidMount () {     // Discount Jonas zet de ingredients direct in de FireBase database en importeert ze dan hier, als response.data (=object)
         console.log(this.props);
-        // axios.get('/ingredients.json')
-        //   .then(response => {
-        //       this.setState({ingredients: response.data})
-        //   }).catch(error => {
-        //       this.setState({error: true})
-        //   })
+        // axios.get( 'https://react-my-burger.firebaseio.com/ingredients.json' )
+        //     .then( response => {
+        //         this.setState( { ingredients: response.data } );
+        //     } )
+        //     .catch( error => {
+        //         this.setState( { error: true } );
+        //     } );
     }
 
-    updatePurchaseState (ingredients) {     // hoeft geen arrowfunctie te zijn, want alle calls bevinden zich ook hier in dezelfde scope
-        const sum = Object.keys(ingredients)    // array met lettuce, meat, etc
-            .map(igKey => {
-            return ingredients[igKey]       // nieuwe array met 0, 1, 0 of wat de aantallen ook zijn
-        }).reduce((sum, el) => {
-            return sum + el;
-        }, 0);                              // alle aantallen bij elkaar opgeteld
-
-        this.setState({purchasable: sum > 0})   // setState true of false, afhankelijk van of er ingrediënten op die hamburger zitten. 1 is al genoeg. De echte vraag is waarom dit werkt terwijl dit geen arrowfunctie is
+    updatePurchaseState ( ingredients ) {     // hoeft geen arrowfunctie te zijn, want alle calls bevinden zich ook hier in dezelfde scope
+        const sum = Object.keys( ingredients )    // array met lettuce, meat, etc
+            .map( igKey => {
+                return ingredients[igKey];       // nieuwe array met 0, 1, 0 of wat de aantallen ook zijn
+            } )
+            .reduce( ( sum, el ) => {
+                return sum + el;
+            }, 0 );                              // alle aantallen bij elkaar opgeteld
+        this.setState( { purchasable: sum > 0 } );   // setState true of false, afhankelijk van of er ingrediënten op die hamburger zitten. 1 is al genoeg. De echte vraag is waarom dit werkt terwijl dit geen arrowfunctie is
     }
 
     changeIngredientHandler = (type, adrem) => {
@@ -88,81 +90,77 @@ class BurgerBuilder extends Component {
         this.changeIngredientHandler(type, 'remove');
     }
 
-    purchaseHandler = () => {           // moet een arrowfunctie zijn, want wordt elders gecalld, dus moet this verwijzen naar deze component en niet naar waar this naar verwijst op de plek waar deze functie gecalld wordt.
-        this.setState({ purchasing: true });
+    purchaseHandler = () => {
+        this.setState( { purchasing: true } );
     }
 
     purchaseCancelHandler = () => {
-        this.setState({ purchasing: false });
+        this.setState( { purchasing: false } );
     }
 
     purchaseContinueHandler = () => {
-        // this.setState({loading: true});         // zodat we eerst de spinner te zien krijgen zodra er op Continue geklikt wordt
+        // alert('You continue!');
+        // this.setState( { loading: true } );
         // const order = {
         //     ingredients: this.state.ingredients,
-        //     price: this.state.totalPrice,        // in een echte app doe je dit aan de serverkant, zodat de gebruiker er niet bij kan om zichzelf korting te geven
+        //     price: this.state.totalPrice,
         //     customer: {
-        //         name: 'Discount Jonas',         // dummy data, gehardcoded, tja, ach, gelukkig zit er geloof ik al een betere versie in de DIY-shop
+        //         name: 'Max Schwarzmüller',
         //         address: {
         //             street: 'Teststreet 1',
-        //             zipCode: '54212',
+        //             zipCode: '41351',
         //             country: 'Germany'
         //         },
-        //         email: 'DiscountJonas@test.com'
+        //         email: 'test@test.com'
         //     },
-        //     deliveryMethod: 'fastest'   // Discount Jonas gaat ervan uit dat er ook een goedkope optie is... 
+        //     deliveryMethod: 'fastest'
         // }
-
-        // axios.post('/posts', order)   // in firebase moet dit '/orders.json' zijn
-        //     .then(res => {
-        //         this.setState({loading: false, purchasing: false});
-        //         console.log(res);
-        //     })
-        //     .catch(error => {
-        //         this.setState({loading: false, purchasing: false});
-        //         console.log(error);
-        //     })
-        this.props.history.push('/checkout');   // ipv allerlei dingen direct te doen, gaan we alleen maar naar onze nieuwe checkoutpagina
+        // axios.post( '/orders.json', order )
+        //     .then( response => {
+        //         this.setState( { loading: false, purchasing: false } );
+        //     } )
+        //     .catch( error => {
+        //         this.setState( { loading: false, purchasing: false } );
+        //     } );
+        this.props.history.push('/checkout');
     }
 
     render () {
         const disabledInfo = {      // we willen knoppen disablen die niets moeten kunnen doen
             ...this.state.ingredients   // in den beginne is dit nog { lettuce: 0, meat: 1} etc
         };
-        for (let key in disabledInfo) {
+        for ( let key in disabledInfo ) {
             disabledInfo[key] = disabledInfo[key] <= 0  // bij elk ingredient checken we of de hoeveelheid kleiner of gelijk is aan 0, zo ja, dan slaan we true op onder die key in disabledInfo: { lettuce: true, meat: false } etc
         }
+        let orderSummary = null;         // als er in eerste instantie geen ingredienten zijn, kan OrderSummary ook niet laden
+        let burger = this.state.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;        // nodig bij database en initial state.ingredients: null. Als de ingredienten helemaal niet doorkomen uit de database, moet dat gemeld worden ipv een spinner
 
-        let orderSummary = null         // als er in eerste instantie geen ingredienten zijn, kan OrderSummary ook niet laden
-
-        let burger = (this.state.error) ? <p>Ingredients can't be loaded!</p> : <Spinner />          // nodig bij database en initial state.ingredients: null. Als de ingredienten helemaal niet doorkomen uit de database, moet dat gemeld worden ipv een spinner
-            
-        if (this.state.ingredients) {   // (heb ik dus altijd, want ik heb state.ingredients niet op null...)
-            burger = (<Aux>
-                <Burger ingredients={this.state.ingredients} />
-                <BuildControls 
-                    ingredientAdded={this.addIngredientHandler} 
-                    ingredientRemoved={this.removeIngredientHandler}
-                    disabled={disabledInfo} /* disabledInfo is hier een object { lettuce: true, meat: false } etc oid */ 
-                    price={this.state.totalPrice}
-                    purchasable={this.state.purchasable}
-                    ordered={this.purchaseHandler} />
-            </Aux>);
-            orderSummary = <OrderSummary 
-            ingredients={this.state.ingredients}
-            purchaseCancelled={this.purchaseCancelHandler}
-            purchaseContinued={this.purchaseContinueHandler}
-            price={this.state.totalPrice} />;
+        if ( this.state.ingredients ) {   // (heb ik dus altijd, want ik heb state.ingredients niet op null...)
+            burger = (
+                <Aux>
+                    <Burger ingredients={this.state.ingredients} />
+                    <BuildControls
+                        ingredientAdded={this.addIngredientHandler}
+                        ingredientRemoved={this.removeIngredientHandler}
+                        disabled={disabledInfo} /* disabledInfo is hier een object { lettuce: true, meat: false } etc oid */ 
+                        purchasable={this.state.purchasable}
+                        ordered={this.purchaseHandler}
+                        price={this.state.totalPrice} />
+                </Aux>
+            );
+            orderSummary = <OrderSummary
+                ingredients={this.state.ingredients}
+                price={this.state.totalPrice}
+                purchaseCancelled={this.purchaseCancelHandler}
+                purchaseContinued={this.purchaseContinueHandler} />;
         }
-
-        if (this.state.loading) {       // deze if moet onder de vorige, wat deze moet die andere overriden
+        if ( this.state.loading ) {       // deze if moet onder de vorige, wat deze moet die andere overriden
             orderSummary = <Spinner />;
         }
-
-
+        // {salad: true, meat: false, ...}
         return (
             <Aux>
-                <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler} >
+                <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
                 {burger}
@@ -171,5 +169,4 @@ class BurgerBuilder extends Component {
     }
 }
 
-// export default withErrorHandler(BurgerBuilder, axios);
-export default withRouter(BurgerBuilder);   // dit is erg idioot, want history. match etc hoort gewoon al in de BurgerBuilder props te zitten. Maar om een of andere reden is props hier leeg??!! index.js, app.js zijn identiek aan Discount Jonas' versie, BurgerBuilder.js is identiek op het FireBasegedoe na. Iek niet begroip.
+export default withErrorHandler( BurgerBuilder, axios );
