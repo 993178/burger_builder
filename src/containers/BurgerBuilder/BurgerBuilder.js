@@ -154,7 +154,7 @@ class BurgerBuilder extends Component {
                 purchaseCancelled={this.purchaseCancelHandler}
                 purchaseContinued={this.purchaseContinueHandler} />;
         }
-        if ( this.state.loading ) {       // deze if moet onder de vorige, wat deze moet die andere overriden
+        if ( this.state.loading ) {       // deze if moet onder de vorige, want deze moet die andere overriden
             orderSummary = <Spinner />;
         }
         // {salad: true, meat: false, ...}
