@@ -122,11 +122,19 @@ class BurgerBuilder extends Component {
         //     .catch( error => {
         //         this.setState( { loading: false, purchasing: false } );
         //     } );
-        this.props.history.push('/checkout');
+        const queryParams = [];     // moet lijstje met ingrediënten worden om door te geven aan de checkout
+        for (let i in this.state.ingredients) {     // we kijken welke ingrediënten er in de state staan en
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));   // encoderen die zodat ze zonder problemen in een url kunnen staan, plus de [waarde] behorend bij die i: dus je krijgt iets van meat=1 in the url. Dat gooien we dan in ons lijstje
+        }
+        const queryString = queryParams.join('&');  // we smeden al die ingrediënt=aantals met ampersands aan elkaar (zo komt zo'n maffe url dus tot stand... En dat moet die browser dan weer begrijpen)
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + queryString   // dus dit moet de url worden, althans het stuk na /checkout
+        });
     }
 
     render () {
-        const disabledInfo = {      // we willen knoppen disablen die niets moeten kunnen doen
+        const disabledInfo = {      // we willen knoppen disablen die niets moeten kunnen doen, dus maken een kopietje van de state
             ...this.state.ingredients   // in den beginne is dit nog { lettuce: 0, meat: 1} etc
         };
         for ( let key in disabledInfo ) {

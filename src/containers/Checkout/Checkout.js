@@ -12,6 +12,15 @@ class Checkout extends Component {
         }
     }
 
+    componentDidMount() {
+        const query = new URLSearchParams(this.props.location.search);       // rare url weer uit elkaar plukken om te kijken wat er aan info in zit
+        const ingredients = {};
+        for (let param of query.entries()) {    // .entries trekt een object, of in dit geval een url, uit elkaar tot een array met kleinere arrays for elk key-value pair
+            ingredients[param[0]] = +param[1];  // komt erop neer dat de props.location.search string weer als object wordt opgebouwd
+        }
+        this.setState({ingredients: ingredients});  // vers opgebouwde ingredients gaat onder de noemer ingredients de state in
+    }
+
     checkoutCancelledHandler = () => {
         console.log('order cancelled')
         this.props.history.goBack();
