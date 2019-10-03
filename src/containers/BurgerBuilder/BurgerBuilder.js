@@ -10,7 +10,7 @@ import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../axios-orders';   // is dus de instance, niet direct axios zelf
 
 const INGREDIENT_PRICES = {    // global constants doe je met alleen hoofdletters
-    salad: 0.5,
+    lettuce: 0.5,
     cheese: 0.4,
     meat: 1.3,
     bacon: 0.7
@@ -36,7 +36,7 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount () {     // Discount Jonas zet de ingredients direct in de FireBase database en importeert ze dan hier, als response.data (=object)
-        console.log(this.props);
+        //console.log(this.props);
         // axios.get( 'https://react-my-burger.firebaseio.com/ingredients.json' )
         //     .then( response => {
         //         this.setState( { ingredients: response.data } );
@@ -100,32 +100,11 @@ class BurgerBuilder extends Component {
 
     purchaseContinueHandler = () => {
         // alert('You continue!');
-        // this.setState( { loading: true } );
-        // const order = {
-        //     ingredients: this.state.ingredients,
-        //     price: this.state.totalPrice,
-        //     customer: {
-        //         name: 'Max Schwarzmüller',
-        //         address: {
-        //             street: 'Teststreet 1',
-        //             zipCode: '41351',
-        //             country: 'Germany'
-        //         },
-        //         email: 'test@test.com'
-        //     },
-        //     deliveryMethod: 'fastest'
-        // }
-        // axios.post( '/orders.json', order )
-        //     .then( response => {
-        //         this.setState( { loading: false, purchasing: false } );
-        //     } )
-        //     .catch( error => {
-        //         this.setState( { loading: false, purchasing: false } );
-        //     } );
         const queryParams = [];     // moet lijstje met ingrediënten worden om door te geven aan de checkout
         for (let i in this.state.ingredients) {     // we kijken welke ingrediënten er in de state staan en
             queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));   // encoderen die zodat ze zonder problemen in een url kunnen staan, plus de [waarde] behorend bij die i: dus je krijgt iets van meat=1 in the url. Dat gooien we dan in ons lijstje
         }
+        queryParams.push('price=' + this.state.totalPrice); // en de totale prijs moet ook doorgegeven worden aan de checkout! Wel zo handig
         const queryString = queryParams.join('&');  // we smeden al die ingrediënt=aantals met ampersands aan elkaar (zo komt zo'n maffe url dus tot stand... En dat moet die browser dan weer begrijpen)
         this.props.history.push({
             pathname: '/checkout',

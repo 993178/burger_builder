@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './Button.module.css';
 
-const button = (props) => (     // DiscountJonas doet classNames met een array [classes.Butoon, classes[props.btnType]].join(' ').  Okee dan.
+const button = (props) => (     // DiscountJonas doet classNames met een array [classes.Button, classes[props.btnType]].join(' ').  Okee dan.
     <button className={`${classes.Button} ${classes[props.btnType]}`} onClick={props.clicked} >{props.children}
     </button>
 )

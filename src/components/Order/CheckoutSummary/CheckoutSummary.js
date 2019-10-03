@@ -5,7 +5,7 @@ import Burger from '../../Burger/Burger';
 import Button from '../../UI/Button/Button';
 
 const checkoutSummary = (props) => {
-    console.log(props);
+    //console.log(props);
     return (
         <div className={classes.CheckoutSummary}>
             <h1>May the taste be ever your favourite</h1>
