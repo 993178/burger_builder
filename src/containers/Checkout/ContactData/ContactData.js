@@ -33,7 +33,7 @@ class ContactData extends Component {
             },
             deliveryMethod: 'fastest'
         }
-        axios.post( '/orders.json', order )
+        axios.post( '/posts', order )     // voor de firebase staat hier axios.post( '/orders.json', order )
             .then( response => {
                 this.setState( { loading: false } );
                 console.log('ordered burger');

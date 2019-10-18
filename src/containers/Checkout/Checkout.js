@@ -10,7 +10,7 @@ class Checkout extends Component {
         totalPrice: 0
     }
 
-    componentWillMount() {
+    componentWillMount() {      // deze moet vervangen worden door of de initial state of, indien side effects, door componentDidMount, wat het eerst was. Discount Jonas heeft hem veranderd omdat we een error kregen over dat ingredients hier nog null is (geloof ik, lecture 254-255, daaromtrent) terwijl er wel methods op losgelaten worden. Dus ik zou dit ook weer in Did kunnen veranderen en een dummy initial ingredients object kunnen toevoegen ipv null. Blijf nu even bij Jonas' code
         const query = new URLSearchParams(this.props.location.search);       // rare url weer uit elkaar plukken om te kijken wat er aan info in zit
         console.log('this props location search: '+ this.props.location.search);
         const ingredients = {};
