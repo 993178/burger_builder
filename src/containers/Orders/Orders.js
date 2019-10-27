@@ -33,8 +33,13 @@ class Orders extends Component {    // dit is dus niet meer wat de klant ziet? O
     render () {
         return (
             <div>
-                <Order />
-                <Order />
+                {this.state.orders.map(order => (       // loopen door de orders, hoeveel het er ook zijn
+                    <Order 
+                    key={order.id}
+                    ingredients={order.ingredients}     // is dus allemaal Firebase spul
+                    price={order.price}     // je kunt hier een + voor zetten om Javascript te dwingen het door te geven als nummer ipv als string; dat is dan ipv het Number.parseFloat(props.price) in Order.js
+                     />
+                ))}
             </div>
         );
     }
